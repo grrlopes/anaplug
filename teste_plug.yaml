@@ -1,0 +1,20 @@
+---
+- hosts: all
+  vars:
+    arquivo: 
+      "data_bra.csv"
+    conteudo: 
+      "{{ lookup('anaplug', 'arquivo={{ arquivo }} separador=| coluna=SERIALNUMBER var1=FOX1612GU2Q' ) }}"
+  tasks:
+    - name: 
+        Debugador
+      debug: 
+        msg="{{ conteudo }}"
+    - name: 
+        Valores por filtro
+      command: 
+        echo {{ item.value }}
+      with_dict: 
+        "{{ conteudo|default({}) }}"
+      when: 
+        item.value == "Deployed"
