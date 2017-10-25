@@ -11,15 +11,13 @@ except:
 def rparsear():
     parsear = argparse.ArgumentParser(description='Ana Descoberta de servico CMDB')
 
-    parsear.add_argument('--frase', action='store', dest='frase', default='Valor padraozao', \
-                            required=False, help='A frase que deseja imprimir n vezes.')
-    parsear.add_argument('--file', action='store', dest='filecsv', \
-                            required=True, help='Informe o local do arquivo CVS. Ex: /tmp/file.cvs')
+    parsear.add_argument('--file', action='store', dest='filecsv', required=False, \
+                            help='Informe o local do arquivo CVS. Ex: /tmp/file.cvs')
     parsear.add_argument('--delimiter', action='store', dest='delim', default='|', \
                             required=False, help='Informe o separador. Ex: ;')
-    parsear.add_argument('--search', action='store', dest='search', required=True, \
+    parsear.add_argument('--search', action='store', dest='search', required=False, \
                             help='Informe o valor a ser pesquisado')
-    parsear.add_argument('--column', action='store', dest='column', required=True, \
+    parsear.add_argument('--column', action='store', dest='column', required=False, \
                             help='Informe a coluna: NAME|ASSETID|COMPANY|DELIVERYUNIT|VIRTUAL DC| \
                             DISTR NTW|ENVIRONMENT|STATUS|CATEGORY|TYPE|ITEM|PROJECT|HOSTNAME|MANAGED| \
                             IP ADDRESS|ADMVE FQDN|IOS_VERSION|MON_REQ|MON_POLICY|TO BE MON|SUPPLIER| \
@@ -47,15 +45,23 @@ def listagem():
         lista = csv.DictReader(files, delimiter=argum.delim)
         for valor in lista:
             if valor[argum.column] != argum.search:
-                hosts.append(valor["IP ADDRESS"])
+                hosts = valor["ADMVE FQDN"]
                 archive["telecom"] = {"hosts": hosts}
                 varr["vars"] = valor
                 archive["telecom"].update(varr)
         print "\n%s\n" %archive
         print to_jason(archive)
 
-def to_jason(in_dict):
-    return json.dumps(in_dict, sort_keys=True, indent=2)
+def to_jason(_dict):
+    return json.dumps(_dict, sort_keys=True, indent=2)
+
+def main():
+    argum = rparsear()
+    if argum.column is None and argum.search is None \
+    and argum.filecsv is None:
+        pass
+    else:
+        listagem()
 
 if __name__ == '__main__':
-    listagem()
+    main()
