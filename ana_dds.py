@@ -37,23 +37,42 @@ def listagem():
     hosts = []
     varr = dict()
     try:
-        files = open(argum.filecsv, 'r')
+        files = open(argum.filecsv, 'rb')
     except IOError as err:
         print "I/O error({0}): {1}".format(err.errno, err.strerror)
         sys.exit(0)
     with files:
         lista = csv.DictReader(files, delimiter=argum.delim)
         for valor in lista:
-            if valor[argum.column] != argum.search:
+            if valor[argum.column] == argum.search:
                 hosts = valor["ADMVE FQDN"]
                 archive["telecom"] = {"hosts": hosts}
                 varr["vars"] = valor
                 archive["telecom"].update(varr)
-        print "\n%s\n" %archive
-        print to_jason(archive)
+        print "\n%s\n" %varr
+        #print to_jason(archive)
 
 def to_jason(_dict):
     return json.dumps(_dict, sort_keys=True, indent=2)
+
+def ans_listagem():
+    archive = {"telecom":{}}
+    hosts = []
+    varr = dict()
+    try:
+        files = open('./data_bra.csv', 'r')
+    except IOError as err:
+        print "I/O error({0}): {1}".format(err.errno, err.strerror)
+        sys.exit(0)
+    with files:
+        lista = csv.DictReader(files, delimiter="|")
+        for valor in lista:
+            if valor['ADMVE FQDN'] != 'IPSI_01A10.bs.br.bsch':
+                hosts = valor["ADMVE FQDN"]
+                archive["telecom"] = {"hosts": hosts}
+                varr["vars"] = valor
+                archive["telecom"].update(varr)
+        print to_jason(archive)
 
 def main():
     argum = rparsear()
