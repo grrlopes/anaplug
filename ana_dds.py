@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# encoding: utf-8
+# encoding: iso-8859-1
+# encoding: win-1252
 import csv
 import argparse
 import sys
@@ -49,8 +52,7 @@ def listagem():
                 archive["telecom"] = {"hosts": hosts}
                 varr["vars"] = valor
                 archive["telecom"].update(varr)
-        print "\n%s\n" %varr
-        #print to_jason(archive)
+        print to_jason(archive)
 
 def to_jason(_dict):
     return json.dumps(_dict, sort_keys=True, indent=2)
