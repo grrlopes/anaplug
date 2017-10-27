@@ -1,0 +1,13 @@
+---
+- hosts: all
+  connection: local
+  #serial: 10
+  tasks:
+    - name: Maldida abstracao
+      #command: echo {{ inventory_hostname }}
+      debug:
+        var: MANUFACTURER
+    - name: Updating Cisco Firmware...
+      debug:
+        msg: "Updating... do not reboot..."
+      when: MANUFACTURER == "CISCO"

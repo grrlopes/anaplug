@@ -17,9 +17,13 @@ def rparsear():
     parsear.add_argument('--file', action='store', dest='filecsv', required=False, \
                             help='Informe o local do arquivo CVS. Ex: /tmp/file.cvs')
     parsear.add_argument('--delimiter', action='store', dest='delim', default='|', \
-                            required=False, help='Informe o separador. Ex: ;')
+                            required=False, help='Informe o separador.Que pode ser: "; - |"')
     parsear.add_argument('--search', action='store', dest='search', required=False, \
                             help='Informe o valor a ser pesquisado')
+    parsear.add_argument('--list', action='store_true', dest='lists', default=False, \
+                            required=False, help='Argumento restrito ao ansible list')
+    parsear.add_argument('--host', action='store', dest='hosts', required=False, \
+                            help='Argumento restrito ao ansible host')
     parsear.add_argument('--column', action='store', dest='column', required=False, \
                             help='Informe a coluna: NAME|ASSETID|COMPANY|DELIVERYUNIT|VIRTUAL DC| \
                             DISTR NTW|ENVIRONMENT|STATUS|CATEGORY|TYPE|ITEM|PROJECT|HOSTNAME|MANAGED| \
@@ -60,6 +64,8 @@ def to_jason(_dict):
 def ans_listagem():
     archive = {"telecom":{}}
     hosts = []
+    argum = rparsear()
+    ans_hosts = []
     varr = dict()
     try:
         files = open('./data_bra.csv', 'r')
@@ -68,19 +74,32 @@ def ans_listagem():
         sys.exit(0)
     with files:
         lista = csv.DictReader(files, delimiter="|")
-        for valor in lista:
-            if valor['ADMVE FQDN'] != 'IPSI_01A10.bs.br.bsch':
+        limits = 0
+        if argum.lists:
+            for valor in lista:
                 hosts = valor["ADMVE FQDN"]
-                archive["telecom"] = {"hosts": hosts}
-                varr["vars"] = valor
+                for _valor in lista:
+                    if limits <= 100:
+                        ans_hosts.append(_valor["ADMVE FQDN"])
+                        limits += 1
+                archive["telecom"] = {"hosts": ans_hosts}
+                varr["vars"] = {"null": "null"}
                 archive["telecom"].update(varr)
-        print to_jason(archive)
+                print to_jason(archive)
+        else:
+            for valor in lista:
+                if valor["ADMVE FQDN"] == argum.hosts:
+                    archive["telecom"] = {"hosts": ans_hosts}
+                    varr["vars"] = {"null": "null"}
+                    archive["telecom"].update(varr)
+                    varr = valor
+            print to_jason(varr)
 
 def main():
     argum = rparsear()
     if argum.column is None and argum.search is None \
     and argum.filecsv is None:
-        pass
+        ans_listagem()
     else:
         listagem()
 
